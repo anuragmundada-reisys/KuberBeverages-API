@@ -1,2 +1,2 @@
-# KuberSecurities-API
-A backend service for Kuber Securities web application.
+# KuberBeveragess-API
+A backend service for Kuber Beverages web application.
