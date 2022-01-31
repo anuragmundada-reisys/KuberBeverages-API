@@ -25,7 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/kuberbeverages/rawmaterials/v1")
-@Tag(name = "Acquisition Controller", description = "Get RawMaterial Details")
+@Tag(name = "Raw Material Controller", description = "Get RawMaterial Details")
 public class RawMaterialsController {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RawMaterialsController.class);
