@@ -23,9 +23,8 @@ public class RawMaterialsService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(RawMaterialsService.class);
 
-    private static final String GET_RAW_MATERIALS_PURCHASE_LIST = "SELECT rmp.*, rm.Raw_Material_Name, p.Product_Type FROM Raw_Material_Purchase rmp LEFT JOIN Raw_Material rm ON rmp.Raw_Material_Id = rm.Raw_Material_Id LEFT JOIN Product p ON rmp.Product_Id = p.Product_Id";
+    private static final String GET_RAW_MATERIALS_PURCHASE_LIST = "SELECT rmp.*, rm.Raw_Material_Name, p.Product_Type FROM Raw_Material_Purchase rmp LEFT JOIN Raw_Material rm ON rmp.Raw_Material_Id = rm.Raw_Material_Id LEFT JOIN Product p ON rmp.Product_Id = p.Product_Id order by Raw_Material_Purchase_Id desc";
     private static final String INSERT_RAW_MATERIALS_PURCHASE = "INSERT INTO Raw_Material_Purchase(Raw_Material_Id, Product_Id, Quantity, Status, Date) VALUES (:rawMaterialId, :productId, :quantity, :status, :purchaseDate)";
-    private static final String DELETE_AWARD = "DELETE from award WHERE piid = :piid";
 
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
