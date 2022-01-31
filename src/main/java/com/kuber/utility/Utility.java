@@ -1,5 +1,6 @@
 package com.kuber.utility;
 
+import com.kuber.model.InventoryRequest;
 import com.kuber.model.OrdersRequest;
 import com.kuber.model.RawMaterialPurchaseRequest;
 
@@ -30,6 +31,18 @@ public class Utility {
             errors.add("Product Id is required");
         }
         if (orderRequest.getQuantity() == 0) {
+            errors.add("Quantity cannot be 0");
+        }
+        return errors;
+    }
+
+    public static List<String> validateInventoryRequest(InventoryRequest inventoryRequest) {
+        List<String> errors = new ArrayList<>();
+
+        if (inventoryRequest.getProductId() == 0) {
+            errors.add("Product Id is required");
+        }
+        if (inventoryRequest.getQuantity() == 0) {
             errors.add("Quantity cannot be 0");
         }
         return errors;
