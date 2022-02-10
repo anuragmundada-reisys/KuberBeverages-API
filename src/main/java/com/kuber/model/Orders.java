@@ -13,16 +13,10 @@ public class Orders {
 
     private int orderId;
 
-    private int productId;
-
     private String customerName;
-
-    private int quantity;
 
     private boolean status;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date orderDate;
-
-    private String productType;
 }

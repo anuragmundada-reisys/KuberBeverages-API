@@ -27,11 +27,17 @@ public class Utility {
     public static List<String> validateOrderRequest(OrdersRequest orderRequest) {
         List<String> errors = new ArrayList<>();
 
-        if (orderRequest.getProductId() == 0) {
-            errors.add("Product Id is required");
+        if (orderRequest.getOrders().isEmpty()) {
+            errors.add("At least one order is required");
         }
-        if (orderRequest.getQuantity() == 0) {
-            errors.add("Quantity cannot be 0");
+        return errors;
+    }
+
+    public static List<String> validateUpdateOrderRequest(OrdersRequest orderRequest) {
+        List<String> errors = new ArrayList<>();
+
+        if (orderRequest.getOrderId() == 0) {
+            errors.add("Order Id is required");
         }
         return errors;
     }

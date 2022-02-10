@@ -1,5 +1,6 @@
 package com.kuber.controller;
 
+import com.kuber.model.OrderResponse;
 import com.kuber.model.Orders;
 import com.kuber.model.OrdersRequest;
 import com.kuber.service.OrdersService;
@@ -15,10 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -41,8 +39,8 @@ public class OrdersController {
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<List<Orders>> getOrders() throws SQLException {
-        List<Orders> orders = orderService.getOrders();
+    public ResponseEntity<List<OrderResponse>> getOrders() throws SQLException {
+        List<OrderResponse> orders = orderService.getOrders();
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
@@ -66,6 +64,28 @@ public class OrdersController {
         } catch (Exception e) {
             LOGGER.error("Error adding Order: ", e);
             return  new ResponseEntity<>("Internal error adding Order.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "Update Order")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Order updated", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
+    @RequestMapping(method = RequestMethod.PATCH, produces = "application/text")
+    public ResponseEntity<Object> updateOrder(@RequestBody OrdersRequest orderRequest) {
+        try {
+            List<String> errorList = Utility.validateUpdateOrderRequest(orderRequest);
+            if (!errorList.isEmpty()) {
+                return new ResponseEntity<>(errorList.toString(), HttpStatus.BAD_REQUEST);
+            } else {
+                return new ResponseEntity<>(orderService.updateOrder(orderRequest) + "", HttpStatus.CREATED);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error updating Order: ", e);
+            return  new ResponseEntity<>("Internal error updating Order.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
