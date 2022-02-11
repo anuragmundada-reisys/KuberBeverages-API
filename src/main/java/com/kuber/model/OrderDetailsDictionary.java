@@ -13,4 +13,8 @@ public class OrderDetailsDictionary {
     private int productId;
 
     private int quantity;
+
+    private int rate;
+
+    private int amount;
 }

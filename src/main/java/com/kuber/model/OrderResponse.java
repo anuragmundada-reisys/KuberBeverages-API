@@ -23,5 +23,7 @@ public class OrderResponse {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date orderDate;
 
+    private int totalAmount;
+
     private ArrayList<OrderDetails> orders;
 }

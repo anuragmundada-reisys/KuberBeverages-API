@@ -16,7 +16,7 @@ public class OrderDetailsRowMapper implements RowMapper<OrderDetails> {
         orderDetails.setOrderId(resultSet.getInt("Order_Id"));
         orderDetails.setProductId(resultSet.getInt("Product_Id"));
         orderDetails.setQuantity(resultSet.getInt("Quantity"));
-
+        orderDetails.setRate(resultSet.getInt("Rate"));
         return orderDetails;
     }
 

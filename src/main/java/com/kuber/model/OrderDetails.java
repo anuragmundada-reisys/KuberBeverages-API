@@ -17,5 +17,9 @@ public class OrderDetails {
 
     private int quantity;
 
+    private int rate;
+
+    private int amount;
+
     private String productType;
 }

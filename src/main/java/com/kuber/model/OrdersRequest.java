@@ -21,6 +21,8 @@ public class OrdersRequest {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date orderDate;
 
+    private int totalAmount;
+
     private List<OrderDetailsDictionary> orders;
 
 }

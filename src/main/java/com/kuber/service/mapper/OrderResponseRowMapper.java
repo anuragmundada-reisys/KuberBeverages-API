@@ -23,6 +23,7 @@ public class OrderResponseRowMapper implements RowMapper<OrderResponse> {
         orderResponse.setCustomerName(resultSet.getString("Customer_Name"));
         orderResponse.setStatus(resultSet.getBoolean("Status"));
         orderResponse.setOrderDate(resultSet.getTimestamp("Date"));
+        orderResponse.setTotalAmount(resultSet.getInt("TotalAmount"));
         orderResponse.setOrders(gson.fromJson((String) resultSet.getObject("orders"), listType));
 
         return orderResponse;
