@@ -1,9 +1,13 @@
 package com.kuber.controller;
 
+import com.kuber.model.CollectionSearchResponse;
 import com.kuber.model.OrderResponse;
 import com.kuber.model.Orders;
 import com.kuber.model.OrdersRequest;
 import com.kuber.service.OrdersService;
+import com.kuber.service.mapper.AssignHistoryResponse;
+import com.kuber.service.mapper.AssigneeHistoryRowMapper;
+import com.kuber.service.mapper.OrderResponseRowMapper;
 import com.kuber.utility.Utility;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,12 +18,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/kuberbeverages/orders/v1")
@@ -44,7 +51,6 @@ public class OrdersController {
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
-
     @Operation(summary = "Add Order")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Order created", content = @Content),
@@ -57,13 +63,15 @@ public class OrdersController {
         try {
             List<String> errorList = Utility.validateOrderRequest(orderRequest);
             if (!errorList.isEmpty()) {
-                return new ResponseEntity<>(errorList.toString(), HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(errorList.get(0), HttpStatus.BAD_REQUEST);
             } else {
                 return new ResponseEntity<>(orderService.addOrder(orderRequest) + "", HttpStatus.CREATED);
             }
+        } catch (DuplicateKeyException e) {
+            return new ResponseEntity<>("Duplicate Entry Found.", HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             LOGGER.error("Error adding Order: ", e);
-            return  new ResponseEntity<>("Internal error adding Order.", HttpStatus.INTERNAL_SERVER_ERROR);
+            return  new ResponseEntity<>("Internal error adding Order. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -87,5 +95,33 @@ public class OrdersController {
             LOGGER.error("Error updating Order: ", e);
             return  new ResponseEntity<>("Internal error updating Order.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Operation(summary = "Get Order Assignee History")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get All Orders",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Orders.class))}),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
+    @RequestMapping(value = "assigneehistory/{orderId}", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<List<AssignHistoryResponse>> getOrderAssigneeHistory(@PathVariable int orderId) throws SQLException {
+        List<AssignHistoryResponse> orders = orderService.getOrderAssigneeHistory(orderId);
+        return new ResponseEntity<>(orders, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Collection Search")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get All Orders",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Orders.class))}),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
+    @RequestMapping(value = "/collection/search", method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<List<OrderResponse>> getCollectionSearchOrders(@RequestParam(required = false) Map<String, String> params) throws SQLException {
+        List<OrderResponse> orders= orderService.getCollectionSearchOrders(params);
+        return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 }

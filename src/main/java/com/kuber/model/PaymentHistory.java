@@ -6,24 +6,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+
 @Getter
 @Setter
 @NoArgsConstructor
-public class Orders {
+public class PaymentHistory {
+    private int paymentId;
 
     private int orderId;
 
-    private String customerName;
+    private int receivedAmount;
 
-    private boolean status;
+    private  String paymentMode;
 
-    private boolean assignedStatus;
-
-    private String assigneeName;
+    private String receiverName;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date updatedDate;
+    private Date receivedPaymentDate;
 
-    @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date orderDate;
 }

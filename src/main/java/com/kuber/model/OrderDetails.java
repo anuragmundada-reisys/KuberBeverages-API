@@ -22,4 +22,5 @@ public class OrderDetails {
     private int amount;
 
     private String productType;
+
 }

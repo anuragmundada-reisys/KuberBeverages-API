@@ -7,9 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Inventory {
+public class PaymentMetricsResponse {
+    private int totalAmount;
 
-    private int productId;
-
-    private int quantity;
+    private String paymentMode;
 }

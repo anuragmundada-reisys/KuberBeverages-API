@@ -6,17 +6,19 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class InventoryRequest {
+public class InventoryResponse {
     private int inventoryId;
 
-    List<Inventory> products;
+    private int productId;
+
+    private int quantity;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date productReceivedDate;
+    private Date productionDate;
 
+    private String productType;
 }

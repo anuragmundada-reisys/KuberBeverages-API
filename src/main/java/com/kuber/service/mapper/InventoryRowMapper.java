@@ -1,16 +1,16 @@
 package com.kuber.service.mapper;
 
-import com.kuber.model.Inventory;
+import com.kuber.model.InventoryResponse;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class InventoryRowMapper implements RowMapper<Inventory> {
+public class InventoryRowMapper implements RowMapper<InventoryResponse> {
 
     @Override
-    public Inventory mapRow(ResultSet resultSet, int i) throws SQLException {
-        Inventory inventory = new Inventory();
+    public InventoryResponse mapRow(ResultSet resultSet, int i) throws SQLException {
+        InventoryResponse inventory = new InventoryResponse();
 
         inventory.setInventoryId(resultSet.getInt("Inventory_Id"));
         inventory.setProductId(resultSet.getInt("Product_Id"));

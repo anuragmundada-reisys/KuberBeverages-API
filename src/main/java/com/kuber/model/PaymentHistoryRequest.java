@@ -4,12 +4,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
-public class Inventory {
+public class PaymentHistoryRequest {
+    private int orderId;
 
-    private int productId;
-
-    private int quantity;
+    private List<PaymentHistory> receivedPayments;
 }

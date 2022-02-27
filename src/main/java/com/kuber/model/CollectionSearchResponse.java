@@ -5,15 +5,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.Date;
-
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class OrderResponse {
-
+public class CollectionSearchResponse {
     private int orderId;
 
     private String customerName;
@@ -36,5 +33,4 @@ public class OrderResponse {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date updatedDate;
 
-    private ArrayList<OrderDetails> orders;
 }

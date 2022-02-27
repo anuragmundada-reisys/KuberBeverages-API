@@ -20,6 +20,10 @@ public class DictionaryService {
 
     private static final String GET_RAW_MATERIALS_DICTIONARY = "SELECT Raw_Material_Id as 'key', Raw_Material_Name as 'value' from Raw_Material";
     private static final String GET_PRODUCT_TYPE_DICTIONARY = "SELECT Product_Id as 'key', Product_Type as 'value' from Product";
+    private static final String GET_CUSTOMER_NAME_DICTIONARY = "SELECT DISTINCT Customer_Name from Orders";
+    private static final String GET_RECEIVER_NAME_DICTIONARY = "SELECT DISTINCT Receiver_Name from Payment_History";
+    private static final String GET_BILLNO_NUMBER_FOR_COLLECTION_DICTIONARY = "SELECT DISTINCT Bill_No from Orders order by Order_Id desc";
+
 
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -29,11 +33,34 @@ public class DictionaryService {
         try {
             List<Dictionary> rawMaterialDictionary = this.namedParameterJdbcTemplate.query(GET_RAW_MATERIALS_DICTIONARY, new MapSqlParameterSource(), new DictionaryRowMapper());
             List<Dictionary> productTypeDictionary = this.namedParameterJdbcTemplate.query(GET_PRODUCT_TYPE_DICTIONARY, new MapSqlParameterSource(), new DictionaryRowMapper());
-
             dictionaries.put("rawMaterialType", rawMaterialDictionary);
             dictionaries.put("productType", productTypeDictionary);
 
             return dictionaries;
+        } catch (Exception e) {
+            throw new SQLException("SQL Error ", e);
+        }
+    }
+
+    public List<String> getCustomerNames() throws SQLException {
+        try {
+            return this.namedParameterJdbcTemplate.queryForList(GET_CUSTOMER_NAME_DICTIONARY, new MapSqlParameterSource(), String.class);
+        } catch (Exception e) {
+            throw new SQLException("SQL Error ", e);
+        }
+    }
+
+    public List<String> getReceivers() throws SQLException {
+        try {
+            return this.namedParameterJdbcTemplate.queryForList(GET_RECEIVER_NAME_DICTIONARY, new MapSqlParameterSource(), String.class);
+        } catch (Exception e) {
+            throw new SQLException("SQL Error ", e);
+        }
+    }
+
+    public List<String> getBillNumbers() throws SQLException {
+        try {
+            return this.namedParameterJdbcTemplate.queryForList(GET_BILLNO_NUMBER_FOR_COLLECTION_DICTIONARY, new MapSqlParameterSource(), String.class);
         } catch (Exception e) {
             throw new SQLException("SQL Error ", e);
         }

@@ -41,4 +41,43 @@ public class DictionaryController {
         Map<String, List<Dictionary>> dictionaries = dictionaryService.getAllDictionaries();
         return new ResponseEntity<>(dictionaries, HttpStatus.OK);
     }
+
+    @Operation(summary = "Get All Customer Names")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get All Customer Names", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
+    @RequestMapping(value="/customers" ,method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Object> getCustomerNames() throws SQLException {
+        List<String> customerNames = dictionaryService.getCustomerNames();
+        return new ResponseEntity<>(customerNames, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get All Payment Receiver Names")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get All Payment Receiver Names", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
+    @RequestMapping(value="/receivers" ,method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Object> getReceivers() throws SQLException {
+        List<String> customerNames = dictionaryService.getReceivers();
+        return new ResponseEntity<>(customerNames, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get All Bill Numbers")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get All Customer Names", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
+    @RequestMapping(value="/billno" ,method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Object> getAllBillNo() throws SQLException {
+        List<String> customerNames = dictionaryService.getBillNumbers();
+        return new ResponseEntity<>(customerNames, HttpStatus.OK);
+    }
 }

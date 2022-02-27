@@ -23,6 +23,17 @@ public class OrdersRequest {
 
     private int totalAmount;
 
+    private String billNo;
+
+    private boolean assignUpdate;
+
+    private String assigneeName;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private Date updatedDate;
+
+    private boolean assignedStatus;
+
     private List<OrderDetailsDictionary> orders;
 
 }

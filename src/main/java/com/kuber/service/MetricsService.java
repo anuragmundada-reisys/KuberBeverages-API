@@ -1,8 +1,11 @@
 package com.kuber.service;
 
+import com.kuber.model.AvailableStockMetricsResponse;
 import com.kuber.model.Dictionary;
 import com.kuber.model.MetricsResponse;
 import com.kuber.model.RawMaterialDictionary;
+import com.kuber.service.mapper.AvailableStockMetricsRowMapper;
+import com.kuber.service.mapper.DictionaryRowMapper;
 import com.kuber.service.mapper.MetricsResponseRowMapper;
 import com.kuber.service.mapper.RawMaterialDictionaryRowMapper;
 import org.slf4j.Logger;
@@ -13,8 +16,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class MetricsService {
@@ -45,21 +48,42 @@ public class MetricsService {
             " Left join Raw_Material rm on rm.Raw_Material_Id = rmp.Raw_Material_Id\n" +
             " WHERE rmp.Product_Id=:productId group by 1;";
 
+    private static final String GET_ORDERS_BY_DATE = "SELECT p.Product_Type as `value`, sum(od.Quantity) as `key` from Orders orders left  join Order_Details od  on orders.Order_Id = od.Order_Id \n" +
+            "left join Product p on p.Product_Id = od.Product_Id  where DATE_FORMAT(orders.Date, '%Y-%m-%d')= :receivedDate group by od.Product_Id";
+
+    private static final String GET_PAYMENT_METRICS = "SELECT sum(Received_Payment) as `key`, Payment_Mode as `value` from Payment_History  where DATE_FORMAT(Received_Date, '%Y-%m-%d')= :receivedDate group by Payment_Mode";
+
+
+    private static final String GET_AVAILABLE_STOCK= "SELECT CASE WHEN i.sum IS NOT NULL AND oc.sum IS NOT NULL THEN (i.sum - oc.sum) WHEN i.sum IS NOT NULL THEN i.sum ELSE 0 END AS availableStock, \n" +
+            "p.Product_Type AS title FROM Product p LEFT JOIN  ((SELECT Product_Id, sum(Quantity) AS sum FROM Inventory GROUP BY 1) i\n" +
+            "LEFT JOIN (SELECT od.Product_Id, sum(od.Quantity) AS sum FROM Order_Details od  GROUP BY 1) oc\n" +
+            "ON i.Product_Id = oc.Product_Id ) on i.Product_Id = p.Product_Id GROUP BY p.Product_Type";
+
+
+
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public List<MetricsResponse> getMetrics() throws SQLException {
-        List<MetricsResponse> metricsResponseList = new ArrayList<>();
+    public Map<String, List<Dictionary>> getMetrics(Date receivedDate) throws SQLException {
+        Map<String, List<Dictionary>> dictionaries = new HashMap<>();
         try {
-            metricsResponseList = this.namedParameterJdbcTemplate.query(GET_AVAILABLE_STOCK_AND_PENDING_ORDERS, new MapSqlParameterSource(), new MetricsResponseRowMapper());
+            MapSqlParameterSource parameters = new MapSqlParameterSource();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            parameters.addValue("receivedDate", formatter.format(receivedDate));
+            List<Dictionary> ordersDictionary = this.namedParameterJdbcTemplate.query(GET_ORDERS_BY_DATE, parameters, new DictionaryRowMapper());
+            List<Dictionary> paymentDictionary = this.namedParameterJdbcTemplate.query(GET_PAYMENT_METRICS, parameters, new DictionaryRowMapper());
+            dictionaries.put("orders", ordersDictionary);
+            dictionaries.put("payment", paymentDictionary);
 
-            for (MetricsResponse metricsResponse: metricsResponseList) {
-                MapSqlParameterSource mapSqlParameterSource = new MapSqlParameterSource();
-                mapSqlParameterSource.addValue("productId", metricsResponse.getProductId());
-                List<RawMaterialDictionary> availableRawMaterials = this.namedParameterJdbcTemplate.query(GET_AVAILABLE_RAW_MATERIAL_LIST_BY_PRODUCT_ID, mapSqlParameterSource, new RawMaterialDictionaryRowMapper());
-                metricsResponse.setAvailableRawMaterial(availableRawMaterials);
-            }
-            return metricsResponseList;
+            return dictionaries;
+        } catch (Exception e) {
+            throw new SQLException("SQL Error ", e);
+        }
+    }
+
+    public List<AvailableStockMetricsResponse> getAvailableStock() throws SQLException {
+        try {
+            return this.namedParameterJdbcTemplate.query(GET_AVAILABLE_STOCK, new MapSqlParameterSource(), new AvailableStockMetricsRowMapper());
         } catch (Exception e) {
             throw new SQLException("SQL Error ", e);
         }

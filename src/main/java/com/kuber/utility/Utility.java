@@ -2,10 +2,13 @@ package com.kuber.utility;
 
 import com.kuber.model.InventoryRequest;
 import com.kuber.model.OrdersRequest;
+import com.kuber.model.PaymentHistoryRequest;
 import com.kuber.model.RawMaterialPurchaseRequest;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 
 public class Utility {
 
@@ -28,7 +31,7 @@ public class Utility {
         List<String> errors = new ArrayList<>();
 
         if (orderRequest.getOrders().isEmpty()) {
-            errors.add("At least one order is required");
+            errors.add("Please add Ordered items");
         }
         return errors;
     }
@@ -42,14 +45,21 @@ public class Utility {
         return errors;
     }
 
+    /*public static List<String> validatePaymentHistoryRequest(PaymentHistoryRequest paymentHistoryRequest) {
+        List<String> errors = new ArrayList<>();
+
+
+        if (paymentHistoryRequest.getReceivedPayments(). == 0) {
+            errors.add("Order Id is required");
+        }
+        return errors;
+    }*/
+
     public static List<String> validateInventoryRequest(InventoryRequest inventoryRequest) {
         List<String> errors = new ArrayList<>();
 
-        if (inventoryRequest.getProductId() == 0) {
-            errors.add("Product Id is required");
-        }
-        if (inventoryRequest.getQuantity() == 0) {
-            errors.add("Quantity cannot be 0");
+        if(isEmpty(inventoryRequest.getProducts())){
+            errors.add("At least one Product is required");
         }
         return errors;
     }
