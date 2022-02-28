@@ -15,8 +15,6 @@ public class Orders {
 
     private String customerName;
 
-    private boolean status;
-
     private boolean assignedStatus;
 
     private String assigneeName;

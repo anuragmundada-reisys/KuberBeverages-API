@@ -16,8 +16,6 @@ public class OrdersRequest {
 
     private String customerName;
 
-    private boolean status;
-
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date orderDate;
 

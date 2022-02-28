@@ -13,7 +13,6 @@ public class OrderRowMapper implements RowMapper<Orders> {
 
         order.setOrderId(resultSet.getInt("Order_Id"));
         order.setCustomerName(resultSet.getString("Customer_Name"));
-        order.setStatus(resultSet.getBoolean("Status"));
         order.setOrderDate(resultSet.getTimestamp("Date"));
 
         return order;

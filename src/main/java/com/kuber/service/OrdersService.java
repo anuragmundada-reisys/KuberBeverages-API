@@ -33,7 +33,7 @@ public class OrdersService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(OrdersService.class);
 
-    private static final String INSERT_ORDER = "INSERT INTO Orders(Customer_Name, Status, TotalAmount, Date, Bill_No) VALUES ( :customerName, :status, :totalAmount, :orderDate, :billNo)";
+    private static final String INSERT_ORDER = "INSERT INTO Orders(Customer_Name, TotalAmount, Date, Bill_No) VALUES ( :customerName, :totalAmount, :orderDate, :billNo)";
     private static final String INSERT_ORDER_DETAILS = "INSERT INTO Order_Details(Order_Id, Product_Id, Quantity, Rate, Amount) VALUES ( :orderId, :productId, :quantity, :rate, :amount)";
     private static final String GET_LAST_INSERTED_ORDER_ID = "SELECT LAST_INSERT_ID()";
 

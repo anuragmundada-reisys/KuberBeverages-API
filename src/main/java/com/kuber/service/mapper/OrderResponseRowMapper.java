@@ -21,7 +21,6 @@ public class OrderResponseRowMapper implements RowMapper<OrderResponse> {
 
         orderResponse.setOrderId(resultSet.getInt("Order_Id"));
         orderResponse.setCustomerName(resultSet.getString("Customer_Name"));
-        orderResponse.setStatus(resultSet.getBoolean("Status"));
         orderResponse.setOrderDate(resultSet.getTimestamp("Date"));
         orderResponse.setTotalAmount(resultSet.getInt("TotalAmount"));
         orderResponse.setBillNo(resultSet.getString("Bill_No"));
