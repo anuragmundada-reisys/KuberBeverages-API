@@ -59,26 +59,4 @@ public class PaymentHistoryController {
             return  new ResponseEntity<>("Internal error adding Payment.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-   /* @Operation(summary = "Update Order")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Order updated", content = @Content),
-            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
-    @RequestMapping(method = RequestMethod.PATCH, produces = "application/text")
-    public ResponseEntity<Object> updateOrder(@RequestBody OrdersRequest orderRequest) {
-        try {
-            List<String> errorList = Utility.validateUpdateOrderRequest(orderRequest);
-            if (!errorList.isEmpty()) {
-                return new ResponseEntity<>(errorList.toString(), HttpStatus.BAD_REQUEST);
-            } else {
-                return new ResponseEntity<>(orderService.updateOrder(orderRequest) + "", HttpStatus.CREATED);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error updating Order: ", e);
-            return  new ResponseEntity<>("Internal error updating Order.", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }*/
 }

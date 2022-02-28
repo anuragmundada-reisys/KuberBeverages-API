@@ -1,13 +1,10 @@
 package com.kuber.controller;
 
-import com.kuber.model.CollectionSearchResponse;
 import com.kuber.model.OrderResponse;
 import com.kuber.model.Orders;
 import com.kuber.model.OrdersRequest;
 import com.kuber.service.OrdersService;
-import com.kuber.service.mapper.AssignHistoryResponse;
-import com.kuber.service.mapper.AssigneeHistoryRowMapper;
-import com.kuber.service.mapper.OrderResponseRowMapper;
+import com.kuber.model.AssignHistoryResponse;
 import com.kuber.utility.Utility;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -24,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.List;
 import java.util.Map;
 
@@ -46,8 +42,8 @@ public class OrdersController {
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<List<OrderResponse>> getOrders() throws SQLException {
-        List<OrderResponse> orders = orderService.getOrders();
+    public ResponseEntity<List<OrderResponse>> getOrders(@RequestParam(required = false) Map<String, String> params) throws SQLException {
+        List<OrderResponse> orders = orderService.getOrders(params);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
@@ -108,20 +104,6 @@ public class OrdersController {
     @RequestMapping(value = "assigneehistory/{orderId}", method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<List<AssignHistoryResponse>> getOrderAssigneeHistory(@PathVariable int orderId) throws SQLException {
         List<AssignHistoryResponse> orders = orderService.getOrderAssigneeHistory(orderId);
-        return new ResponseEntity<>(orders, HttpStatus.OK);
-    }
-
-    @Operation(summary = "Collection Search")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Get All Orders",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Orders.class))}),
-            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
-    @RequestMapping(value = "/collection/search", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<List<OrderResponse>> getCollectionSearchOrders(@RequestParam(required = false) Map<String, String> params) throws SQLException {
-        List<OrderResponse> orders= orderService.getCollectionSearchOrders(params);
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 }

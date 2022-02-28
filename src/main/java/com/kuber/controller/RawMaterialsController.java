@@ -68,27 +68,4 @@ public class RawMaterialsController {
             return  new ResponseEntity<>("Internal error adding RawMaterial purchase.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-//    @Operation(summary = "Delete an RawMaterial")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "RawMaterial Deleted", content = @Content),
-//            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
-//            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-//            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
-//            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
-//    @RequestMapping(value = "/award/{id}", method = RequestMethod.DELETE)
-//    public ResponseEntity<Object> deleteAward(@PathVariable String id) {
-//        RawMaterial award = acquisitionService.getAwardDetailsById(id);
-//        if (award == null) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-//        }
-//        try {
-//            acquisitionService.deleteAwardById(id);
-//            return new ResponseEntity<>("Successfully Deleted RawMaterial " + id, HttpStatus.OK);
-//        } catch (Exception e) {
-//            LOGGER.error("Error deleting RawMaterial " + id, e);
-//            return new ResponseEntity<>("Internal error deleting RawMaterial.", HttpStatus.INTERNAL_SERVER_ERROR);
-//        }
-//    }
-
 }

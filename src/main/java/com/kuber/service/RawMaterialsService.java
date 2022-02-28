@@ -49,13 +49,4 @@ public class RawMaterialsService {
         return "Raw Material purchase successfully added";
     }
 
-//    @Transactional
-//    public void deleteAwardById(String id) throws SQLException {
-//        MapSqlParameterSource parameters = new MapSqlParameterSource();
-//        parameters.addValue("piid", id);
-//        int count = namedParameterJdbcTemplate.update(DELETE_AWARD, parameters);
-//        if (count != 1) {
-//            throw new SQLException("Could not delete RawMaterial");
-//        }
-//    }
 }

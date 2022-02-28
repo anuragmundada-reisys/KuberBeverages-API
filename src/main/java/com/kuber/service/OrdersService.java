@@ -1,12 +1,10 @@
 package com.kuber.service;
 
-import com.kuber.model.CollectionSearchResponse;
 import com.kuber.model.OrderDetailsDictionary;
 import com.kuber.model.OrderResponse;
 import com.kuber.model.OrdersRequest;
-import com.kuber.service.mapper.AssignHistoryResponse;
+import com.kuber.model.AssignHistoryResponse;
 import com.kuber.service.mapper.AssigneeHistoryRowMapper;
-import com.kuber.service.mapper.CollectionSearchResponseRowMapper;
 import com.kuber.service.mapper.OrderResponseRowMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
 
 import java.sql.SQLException;
-import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,13 +37,6 @@ public class OrdersService {
     private static final String INSERT_ORDER_DETAILS = "INSERT INTO Order_Details(Order_Id, Product_Id, Quantity, Rate, Amount) VALUES ( :orderId, :productId, :quantity, :rate, :amount)";
     private static final String GET_LAST_INSERTED_ORDER_ID = "SELECT LAST_INSERT_ID()";
 
-    private static final String GET_ORDERS = "Select orders.*, orders.TotalAmount - sum(case when ph.totalReceived is null then 0 else ph.totalReceived end) as Balance_Due, od.orders\n" +
-            "from Orders orders \n" +
-            "left join (SELECT CASE WHEN sum(Received_Payment) IS NULL THEN 0 ELSE sum(Received_Payment) END AS totalReceived, Order_Id \n" +
-            "FROM Payment_History GROUP BY Order_Id) ph on orders.Order_Id = ph.Order_Id\n" +
-            "left join (SELECT Order_Id, JSON_ARRAYAGG(JSON_OBJECT('orderDetailsId', o.Order_Details_Id, 'productId', p.Product_Id , 'quantity', o.Quantity, 'rate', o.Rate, 'productType', p.Product_Type, 'amount', o.Amount )) as orders FROM Order_Details o left join Product p on p.Product_Id = o.Product_Id  GROUP BY o.Order_Id) od \n" +
-            "on orders.Order_Id = od.Order_Id \n" +
-            " group by orders.Order_Id order by orders.Order_Id desc;";
 
     private static final String UPDATE_ORDER = "UPDATE Orders set Status=:status, TotalAmount=:totalAmount where Order_Id=:orderId";
     private static final String UPDATE_ORDER_DETAILS = "UPDATE Order_Details set Product_Id=:productId, Quantity=:quantity, Rate=:rate, Amount=:amount where Order_Details_Id=:orderDetailsId";
@@ -54,7 +44,7 @@ public class OrdersService {
     private static final String ASSIGN_ORDER = "UPDATE Orders set Assignee_Name=:assigneeName, Updated_Date=:updatedDate, Assigned_Status=:assignedStatus where Order_Id=:orderId";
     private static final String GET_ORDER_ASSIGNEE_HISTORY = "SELECT * FROM Assignee_History where Order_Id=:orderId order by Order_Id desc";
 
-    private String GET_COLLECTION_SEARCH_ORDERS = "Select orders.*, orders.TotalAmount - sum(case when ph.totalReceived is null then 0 else ph.totalReceived end) as Balance_Due, od.orders\n" +
+    private String GET_ORDERS = "Select orders.*, orders.TotalAmount - sum(case when ph.totalReceived is null then 0 else ph.totalReceived end) as Balance_Due, od.orders\n" +
             " from Orders orders\n" +
             " left join (SELECT CASE WHEN sum(Received_Payment) IS NULL THEN 0 ELSE sum(Received_Payment) END AS totalReceived, Order_Id \n" +
             " FROM Payment_History GROUP BY Order_Id) ph on orders.Order_Id = ph.Order_Id\n" +
@@ -114,13 +104,37 @@ public class OrdersService {
 
     }
 
-    public List<OrderResponse> getOrders() throws SQLException {
-        try {
-            MapSqlParameterSource parameters = new MapSqlParameterSource();
-            return this.namedParameterJdbcTemplate.query(GET_ORDERS, parameters, new OrderResponseRowMapper());
-        } catch (Exception e) {
-            throw new SQLException("SQL Error ", e);
-        }
+    public List<OrderResponse> getOrders(Map<String, String> params) throws SQLException {
+
+            StringBuilder queryString = new StringBuilder();
+            Map<String, String> columnMap = new HashMap<>();
+            columnMap.put("billNo", "Bill_No");
+            columnMap.put("customerName", "Customer_Name");
+            columnMap.put("orderDate", "Date");
+            columnMap.put("assignedStatus", "Assigned_Status");
+            columnMap.put("assigneeName", "Assignee_Name");
+            columnMap.put("updatedDate", "Updated_Date");
+
+            queryString.append(GET_ORDERS);
+            queryString.append(" WHERE 1=1 ");
+            if(!params.isEmpty()){
+                for (String key : params.keySet()) {
+                    String value = params.get(key);
+                    if (!key.equalsIgnoreCase("orderStatus") && isNotBlank(value)) {
+                        queryString.append(" AND " + columnMap.get(key) + "=:" + key);
+                    }
+                }
+            }
+
+            queryString.append(" group by orders.Order_Id order by orders.Order_Id desc");
+            try {
+                MapSqlParameterSource parameters = new MapSqlParameterSource(params);
+                parameters.addValue("assignedStatus", parseBoolean(params.get("assignedStatus")));
+                return this.namedParameterJdbcTemplate.query(queryString.toString(), parameters, new OrderResponseRowMapper());
+            } catch (Exception e) {
+                throw new SQLException("SQL Error ", e);
+            }
+
     }
 
     public List<AssignHistoryResponse> getOrderAssigneeHistory(int orderId) throws SQLException {
@@ -128,34 +142,6 @@ public class OrdersService {
             MapSqlParameterSource parameters = new MapSqlParameterSource();
             parameters.addValue("orderId", orderId);
             return this.namedParameterJdbcTemplate.query(GET_ORDER_ASSIGNEE_HISTORY, parameters, new AssigneeHistoryRowMapper());
-        } catch (Exception e) {
-            throw new SQLException("SQL Error ", e);
-        }
-    }
-
-    public List<OrderResponse> getCollectionSearchOrders(Map<String, String> params) throws SQLException {
-        StringBuilder queryString = new StringBuilder();
-        Map<String, String> columnMap = new HashMap<>();
-        columnMap.put("billNo", "Bill_No");
-        columnMap.put("customerName", "Customer_Name");
-        columnMap.put("orderDate", "Date");
-        columnMap.put("assignedStatus", "Assigned_Status");
-        columnMap.put("assigneeName", "Assignee_Name");
-        columnMap.put("updatedDate", "Updated_Date");
-
-        queryString.append(GET_COLLECTION_SEARCH_ORDERS);
-        queryString.append(" WHERE 1=1 ");
-        for (String key : params.keySet()) {
-            String value = params.get(key);
-            if (!key.equalsIgnoreCase("orderStatus") && isNotBlank(value)) {
-                queryString.append(" AND " + columnMap.get(key) + "=:" + key);
-            }
-        }
-        queryString.append(" group by orders.Order_Id order by orders.Order_Id desc");
-        try {
-            MapSqlParameterSource parameters = new MapSqlParameterSource(params);
-            parameters.addValue("assignedStatus", parseBoolean(params.get("assignedStatus")));
-            return this.namedParameterJdbcTemplate.query(queryString.toString(), parameters, new OrderResponseRowMapper());
         } catch (Exception e) {
             throw new SQLException("SQL Error ", e);
         }

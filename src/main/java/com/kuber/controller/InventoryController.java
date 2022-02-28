@@ -39,8 +39,8 @@ public class InventoryController {
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
     @RequestMapping(method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<List<InventoryResponse>> getOrders() throws SQLException {
-        List<InventoryResponse> inventoryData = inventoryService.getInventory();
+    public ResponseEntity<List<InventoryResponse>> getInventory(@RequestParam(required = false) Map<String, String> params) throws SQLException {
+        List<InventoryResponse> inventoryData = inventoryService.getInventory(params);
         return new ResponseEntity<>(inventoryData, HttpStatus.OK);
     }
 
@@ -65,19 +65,4 @@ public class InventoryController {
             return new ResponseEntity<>("Internal error adding data in Inventory.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
-    @Operation(summary = "Inventory Search")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Get All Orders",
-                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = Orders.class))}),
-            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
-            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
-    @RequestMapping(value = "/search", method = RequestMethod.GET, produces = "application/json")
-    public ResponseEntity<List<InventoryResponse>> searchInventory(@RequestParam Map<String, String> params) throws SQLException {
-        List<InventoryResponse> inventory= inventoryService.searchInventory(params);
-        return new ResponseEntity<>(inventory, HttpStatus.OK);
-    }
-
 }

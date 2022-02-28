@@ -28,8 +28,7 @@ public class InventoryService {
     private static Logger LOGGER = LoggerFactory.getLogger(OrdersService.class);
 
     private static final String INSERT_INVENTORY = "INSERT INTO Inventory(Product_Id, Quantity, Date) VALUES (:productId, :quantity, :productionDate)";
-    private static final String GET_INVENTORY = "SELECT inventory.*, p.Product_Type FROM Inventory inventory LEFT JOIN  Product p ON inventory.Product_Id = p.Product_Id order by Inventory_Id desc";
-   private static final String SEARCH_INVENTORY = "SELECT inventory.*, p.Product_Type FROM Inventory inventory LEFT JOIN  Product p ON inventory.Product_Id = p.Product_Id";
+   private static final String GET_INVENTORY = "SELECT inventory.*, p.Product_Type FROM Inventory inventory LEFT JOIN  Product p ON inventory.Product_Id = p.Product_Id";
     @Transactional
     public String addInventory(InventoryRequest inventoryRequest) throws SQLException {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
@@ -43,43 +42,38 @@ public class InventoryService {
                 throw new SQLException("Failed to insert products in Inventory: " + inventoryRequest.toString());
             }
         }
-
         return "Products successfully added in Inventory";
     }
 
-    public List<InventoryResponse> getInventory() throws SQLException {
-        try {
-            MapSqlParameterSource parameters = new MapSqlParameterSource();
-            return this.namedParameterJdbcTemplate.query(GET_INVENTORY, parameters, new InventoryRowMapper());
-        } catch (Exception e) {
-            throw new SQLException("SQL Error ", e);
-        }
-    }
+    public List<InventoryResponse> getInventory(Map<String, String> params) throws SQLException {
 
-    public List<InventoryResponse> searchInventory(Map<String, String> params) throws SQLException {
-        StringBuilder queryString = new StringBuilder();
-        Map<String, String> columnMap = new HashMap<>();
-        columnMap.put("productType", "Product_Id");
-        columnMap.put("productionDate", "Date");
+            StringBuilder queryString = new StringBuilder();
+            Map<String, String> columnMap = new HashMap<>();
+            columnMap.put("productType", "Product_Id");
+            columnMap.put("productionDate", "Date");
 
-        queryString.append(SEARCH_INVENTORY);
-        queryString.append(" WHERE 1=1 ");
-        for (String key : params.keySet()) {
-            String value = params.get(key);
-            if (isNotBlank(value)) {
-                if(key.equalsIgnoreCase("productType")){
-                    queryString.append(" AND inventory." + columnMap.get(key) + "=:" + key);
-                }else{
-                    queryString.append(" AND " + columnMap.get(key) + "=:" + key);
+            queryString.append(GET_INVENTORY);
+            queryString.append(" WHERE 1=1 ");
+
+            if(!params.isEmpty()){
+                for (String key : params.keySet()) {
+                    String value = params.get(key);
+                    if (isNotBlank(value)) {
+                        if(key.equalsIgnoreCase("productType")){
+                            queryString.append(" AND inventory." + columnMap.get(key) + "=:" + key);
+                        }else{
+                            queryString.append(" AND " + columnMap.get(key) + "=:" + key);
+                        }
+                    }
                 }
             }
-        }
-        queryString.append(" order by Inventory_Id desc");
-        try {
-            MapSqlParameterSource parameters = new MapSqlParameterSource(params);
-            return this.namedParameterJdbcTemplate.query(queryString.toString(), parameters, new InventoryRowMapper());
-        } catch (Exception e) {
-            throw new SQLException("SQL Error ", e);
-        }
+            queryString.append(" order by Inventory_Id desc");
+            try {
+                MapSqlParameterSource parameters = new MapSqlParameterSource(params);
+                return this.namedParameterJdbcTemplate.query(queryString.toString(), parameters, new InventoryRowMapper());
+            } catch (Exception e) {
+                throw new SQLException("SQL Error ", e);
+            }
     }
+
 }

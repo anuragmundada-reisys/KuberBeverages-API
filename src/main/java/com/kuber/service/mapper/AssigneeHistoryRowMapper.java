@@ -1,9 +1,6 @@
 package com.kuber.service.mapper;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.kuber.model.OrderDetails;
-import com.kuber.model.OrderResponse;
+import com.kuber.model.AssignHistoryResponse;
 import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
