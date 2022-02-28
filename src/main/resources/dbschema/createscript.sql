@@ -1,4 +1,4 @@
---Assignee_History
+-- Assignee_History
 CREATE TABLE `Assignee_History` (
                                     `Order_Id` bigint DEFAULT NULL,
                                     `Bill_No` varchar(45) DEFAULT NULL,
@@ -7,7 +7,7 @@ CREATE TABLE `Assignee_History` (
                                     `Updated_Date` varchar(45) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---Order Details
+-- Order Details
 CREATE TABLE `Order_Details` (
                                  `Order_Details_Id` bigint NOT NULL AUTO_INCREMENT,
                                  `Order_Id` bigint NOT NULL,
@@ -22,7 +22,7 @@ CREATE TABLE `Order_Details` (
                                  CONSTRAINT `order_details_product` FOREIGN KEY (`Product_Id`) REFERENCES `Product` (`Product_Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---Orders
+-- Orders
 
 CREATE TABLE `Orders` (
                           `Order_Id` bigint NOT NULL AUTO_INCREMENT,
@@ -37,7 +37,7 @@ CREATE TABLE `Orders` (
                           UNIQUE KEY `Bill_No` (`Bill_No`)
 ) ENGINE=InnoDB AUTO_INCREMENT=159 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---Payment_History
+-- Payment_History
 CREATE TABLE `Payment_History` (
   `Payment_Id` bigint NOT NULL AUTO_INCREMENT,
   `Order_Id` bigint DEFAULT NULL,
@@ -50,7 +50,7 @@ CREATE TABLE `Payment_History` (
   CONSTRAINT `Payment_Order_id` FOREIGN KEY (`Order_Id`) REFERENCES `Orders` (`Order_Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---Product
+-- Product
 
 CREATE TABLE `Product` (
                            `Product_Id` int NOT NULL AUTO_INCREMENT,
@@ -58,7 +58,7 @@ CREATE TABLE `Product` (
                            PRIMARY KEY (`Product_Id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---Raw_Material
+-- Raw_Material
 
 CREATE TABLE `Raw_Material` (
                                 `Raw_Material_Id` int NOT NULL AUTO_INCREMENT,
@@ -66,7 +66,7 @@ CREATE TABLE `Raw_Material` (
                                 PRIMARY KEY (`Raw_Material_Id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---Raw_Material_Purchase
+-- Raw_Material_Purchase
 CREATE TABLE `Raw_Material_Purchase` (
   `Raw_Material_Purchase_Id` bigint NOT NULL AUTO_INCREMENT,
   `Raw_Material_Id` int DEFAULT NULL,
@@ -81,7 +81,7 @@ CREATE TABLE `Raw_Material_Purchase` (
   CONSTRAINT `Purchase_Raw_Material` FOREIGN KEY (`Raw_Material_Id`) REFERENCES `Raw_Material` (`Raw_Material_Id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
---Inventory
+-- Inventory
 CREATE TABLE `Inventory` (
   `Inventory_Id` bigint NOT NULL AUTO_INCREMENT,
   `Product_Id` int DEFAULT NULL,
