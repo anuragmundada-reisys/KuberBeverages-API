@@ -38,7 +38,7 @@ public class OrdersService {
     private static final String GET_LAST_INSERTED_ORDER_ID = "SELECT LAST_INSERT_ID()";
 
 
-    private static final String UPDATE_ORDER = "UPDATE Orders set Status=:status, TotalAmount=:totalAmount where Order_Id=:orderId";
+    private static final String UPDATE_ORDER = "UPDATE Orders set TotalAmount=:totalAmount where Order_Id=:orderId";
     private static final String UPDATE_ORDER_DETAILS = "UPDATE Order_Details set Product_Id=:productId, Quantity=:quantity, Rate=:rate, Amount=:amount where Order_Details_Id=:orderDetailsId";
     private static final String GET_ORDER_BY_ID = "SELECT count(*) FROM Orders where Order_Id=:orderId";
     private static final String ASSIGN_ORDER = "UPDATE Orders set Assignee_Name=:assigneeName, Updated_Date=:updatedDate, Assigned_Status=:assignedStatus where Order_Id=:orderId";
