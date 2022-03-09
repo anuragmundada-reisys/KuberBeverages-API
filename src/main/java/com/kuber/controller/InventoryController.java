@@ -52,13 +52,13 @@ public class InventoryController {
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
     @RequestMapping(method = RequestMethod.POST, produces = "application/text")
-    public ResponseEntity<Object> inventory(@RequestBody InventoryRequest inventoryRequest) {
+    public ResponseEntity<Object> inventory(@RequestBody InventoryRequest inventoryRequest, @RequestHeader (name="Authorization") String token) {
         try {
             List<String> errorList = Utility.validateInventoryRequest(inventoryRequest);
             if (!errorList.isEmpty()) {
                 return new ResponseEntity<>(errorList.get(0), HttpStatus.BAD_REQUEST);
             } else {
-                return new ResponseEntity<>(inventoryService.addInventory(inventoryRequest) + "", HttpStatus.CREATED);
+                return new ResponseEntity<>(inventoryService.addInventory(inventoryRequest, token) + "", HttpStatus.CREATED);
             }
         } catch (Exception e) {
             LOGGER.error("Error adding Inventory: ", e);

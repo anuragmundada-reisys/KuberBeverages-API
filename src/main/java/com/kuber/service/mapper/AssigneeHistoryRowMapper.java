@@ -14,7 +14,7 @@ public class AssigneeHistoryRowMapper implements RowMapper<AssignHistoryResponse
         assignHistoryResponse.setBillNo(resultSet.getString("Bill_No"));
         assignHistoryResponse.setAssignedStatus(resultSet.getBoolean("Assigned_Status"));
         assignHistoryResponse.setAssigneeName(resultSet.getString("Assignee_Name"));
-        assignHistoryResponse.setUpdatedDate(resultSet.getTimestamp("Updated_Date"));
+        assignHistoryResponse.setAssignedUpdatedDate(resultSet.getTimestamp("Assigned_Updated_Date"));
 
         return assignHistoryResponse;
     }

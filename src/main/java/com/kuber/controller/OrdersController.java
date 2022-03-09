@@ -55,13 +55,13 @@ public class OrdersController {
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
     @RequestMapping(method = RequestMethod.POST, produces = "application/text")
-    public ResponseEntity<Object> order(@RequestBody OrdersRequest orderRequest) {
+    public ResponseEntity<Object> order(@RequestBody OrdersRequest orderRequest, @RequestHeader (name="Authorization") String token) {
         try {
             List<String> errorList = Utility.validateOrderRequest(orderRequest);
             if (!errorList.isEmpty()) {
                 return new ResponseEntity<>(errorList.get(0), HttpStatus.BAD_REQUEST);
             } else {
-                return new ResponseEntity<>(orderService.addOrder(orderRequest) + "", HttpStatus.CREATED);
+                return new ResponseEntity<>(orderService.addOrder(orderRequest, token) + "", HttpStatus.CREATED);
             }
         } catch (DuplicateKeyException e) {
             return new ResponseEntity<>("Duplicate Entry Found.", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -79,13 +79,13 @@ public class OrdersController {
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
     @RequestMapping(method = RequestMethod.PATCH, produces = "application/text")
-    public ResponseEntity<Object> updateOrder(@RequestBody OrdersRequest orderRequest) {
+    public ResponseEntity<Object> updateOrder(@RequestBody OrdersRequest orderRequest, @RequestHeader (name="Authorization") String token) {
         try {
             List<String> errorList = Utility.validateUpdateOrderRequest(orderRequest);
             if (!errorList.isEmpty()) {
                 return new ResponseEntity<>(errorList.toString(), HttpStatus.BAD_REQUEST);
             } else {
-                return new ResponseEntity<>(orderService.updateOrder(orderRequest) + "", HttpStatus.CREATED);
+                return new ResponseEntity<>(orderService.updateOrder(orderRequest, token) + "", HttpStatus.CREATED);
             }
         } catch (Exception e) {
             LOGGER.error("Error updating Order: ", e);

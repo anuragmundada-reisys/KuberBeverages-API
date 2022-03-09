@@ -1,9 +1,6 @@
 package com.kuber.utility;
 
-import com.kuber.model.InventoryRequest;
-import com.kuber.model.OrdersRequest;
-import com.kuber.model.PaymentHistoryRequest;
-import com.kuber.model.RawMaterialPurchaseRequest;
+import com.kuber.model.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,22 +42,32 @@ public class Utility {
         return errors;
     }
 
-    /*public static List<String> validatePaymentHistoryRequest(PaymentHistoryRequest paymentHistoryRequest) {
-        List<String> errors = new ArrayList<>();
-
-
-        if (paymentHistoryRequest.getReceivedPayments(). == 0) {
-            errors.add("Order Id is required");
-        }
-        return errors;
-    }*/
-
     public static List<String> validateInventoryRequest(InventoryRequest inventoryRequest) {
         List<String> errors = new ArrayList<>();
 
         if(isEmpty(inventoryRequest.getProducts())){
             errors.add("At least one Product is required");
         }
+        return errors;
+    }
+
+    public static List<String> validateSignUpRequest(SignupRequest signupRequest) {
+        List<String> errors = new ArrayList<>();
+
+        if (signupRequest.getUserName().isEmpty() || signupRequest.getEmail().isEmpty() || signupRequest.getPassword().isEmpty()) {
+            errors.add("All Fields are required!!");
+        }
+
+        return errors;
+    }
+
+    public static List<String> validateLoginRequest(LoginRequest loginRequest) {
+        List<String> errors = new ArrayList<>();
+
+        if (loginRequest.getUsername().isEmpty() ||  loginRequest.getPassword().isEmpty()) {
+            errors.add("All Fields are required!!");
+        }
+
         return errors;
     }
 }
