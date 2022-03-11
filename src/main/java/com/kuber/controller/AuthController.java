@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.annotation.*;
+import org.webjars.NotFoundException;
 
 import java.nio.file.AccessDeniedException;
 import java.sql.SQLException;
@@ -114,4 +115,36 @@ public class AuthController {
            // return  new ResponseEntity<>("Internal error authenticating User. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Operation(summary = "Reset Password")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Reset Password",
+                    content = { @Content(mediaType = "application/json", schema = @Schema(implementation = SignupRequest.class))}),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
+    @RequestMapping( value = "/resetpassword",method = RequestMethod.PATCH, produces = "application/json")
+    public ResponseEntity<Object> resetPassword(@RequestBody LoginRequest resetPasswordRequest, @RequestHeader (name="Authorization") String token) throws SQLException {
+        try {
+            List<String> errorList = Utility.validateLoginRequest(resetPasswordRequest);
+            if (!errorList.isEmpty()) {
+                return new ResponseEntity<>(errorList.get(0), HttpStatus.BAD_REQUEST);
+            } else {
+                String response = authService.resetPassword(resetPasswordRequest, token);
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            }
+        }
+        catch(NotFoundException e){
+            LOGGER.error("User not found");
+            return new ResponseEntity<>("User not found", HttpStatus.NOT_FOUND);
+        }catch (AccessDeniedException e) {
+            return new ResponseEntity<>("Unauthorized: Trying to reset password for another user!", HttpStatus.UNAUTHORIZED);
+        }
+        catch (Exception e) {
+            LOGGER.error("Error resetting password: ", e);
+            return  new ResponseEntity<>("Internal error resetting password. " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

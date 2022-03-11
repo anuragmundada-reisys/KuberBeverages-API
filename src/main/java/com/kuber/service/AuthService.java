@@ -22,6 +22,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 
 import java.nio.file.AccessDeniedException;
 import java.sql.SQLException;
@@ -47,6 +48,7 @@ public class AuthService {
 
     private static final String GET_USER_BY_USER_NAME = "SELECT count(*) from User where User_Name=:userName";
     private static final String INSERT_USER = "INSERT INTO User(User_Name, Email, Password) VALUES ( :userName, :email, :password)";
+    private static final String RESET_PASSWORD = "Update User set Password=:password where User_Name=:userName";
 
 
     public String signup(SignupRequest signupRequest, String token) throws DuplicateKeyException, SQLException, AccessDeniedException {
@@ -137,6 +139,37 @@ public class AuthService {
             SecurityContextHolder.getContext().setAuthentication(null);
         }catch(Exception e){
             throw new Exception(e);
+        }
+    }
+
+    public String resetPassword(LoginRequest resetPasswordRequest, String token) throws NotFoundException, SQLException, AccessDeniedException {
+        try{
+
+            MapSqlParameterSource parameters = new MapSqlParameterSource();
+            parameters.addValue("userName", resetPasswordRequest.getUsername());
+            parameters.addValue("password", encoder.encode(resetPasswordRequest.getPassword()));
+
+            String userName = jwtUtils.getUserNameFromJwtToken(token);
+            if(!userName.equals(resetPasswordRequest.getUsername())){
+                throw new AccessDeniedException("Trying to reset password for another user!");
+            }
+            int userCount = this.namedParameterJdbcTemplate.queryForObject(GET_USER_BY_USER_NAME, parameters, Integer.class);
+            if (userCount == 0) {
+                throw new NotFoundException("User Not Found!");
+            }
+
+            int rowsAffected = this.namedParameterJdbcTemplate.update(RESET_PASSWORD, parameters);
+            if (rowsAffected != 1) {
+                throw new SQLException("Failed to Reset Password");
+            }
+            return "Password Reset successfully";
+        }catch (NotFoundException e) {
+            throw new DuplicateKeyException("User Not Found!");
+        }catch (AccessDeniedException e) {
+            throw new AccessDeniedException("Trying to reset password for another user!");
+        }
+        catch (Exception e) {
+            throw new SQLException("SQL Error ", e);
         }
     }
 }
