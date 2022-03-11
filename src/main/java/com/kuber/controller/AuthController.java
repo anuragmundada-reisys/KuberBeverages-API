@@ -55,7 +55,7 @@ public class AuthController {
                 return new ResponseEntity<>(authService.signup(signupRequest, token) + "", HttpStatus.CREATED);
             }
         } catch (DuplicateKeyException e) {
-            return new ResponseEntity<>("User Already Exits!", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }catch (AccessDeniedException e) {
             return new ResponseEntity<>("You are not authorized to Enroll a User", HttpStatus.UNAUTHORIZED);
         }

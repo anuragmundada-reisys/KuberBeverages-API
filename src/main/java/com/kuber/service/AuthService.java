@@ -4,7 +4,9 @@ import com.kuber.Authentication.JwtUtils;
 import com.kuber.model.LoginRequest;
 import com.kuber.model.LoginResponse;
 import com.kuber.model.SignupRequest;
+import com.kuber.model.User;
 import com.kuber.service.mapper.UserDetailsMapper;
+import com.kuber.service.mapper.UserResponseRowMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +49,7 @@ public class AuthService {
     private static Logger LOGGER = LoggerFactory.getLogger(OrdersService.class);
 
     private static final String GET_USER_BY_USER_NAME = "SELECT count(*) from User where User_Name=:userName";
+    private static final String GET_USER_BY_EMAIL = "SELECT count(*) from User where Email=:email";
     private static final String INSERT_USER = "INSERT INTO User(User_Name, Email, Password) VALUES ( :userName, :email, :password)";
     private static final String RESET_PASSWORD = "Update User set Password=:password where User_Name=:userName";
 
@@ -68,6 +71,12 @@ public class AuthService {
             if (userCount != 0) {
                 throw new DuplicateKeyException("User already exists!");
             }
+
+            int userEmailCount = this.namedParameterJdbcTemplate.queryForObject(GET_USER_BY_EMAIL, namedParameters, Integer.class);
+            if (userEmailCount != 0) {
+                throw new DuplicateKeyException("Email already exists!");
+            }
+
             MapSqlParameterSource parameters = new MapSqlParameterSource();
             parameters.addValue("userName", signupRequest.getUserName());
             parameters.addValue("email", signupRequest.getEmail());
@@ -79,7 +88,7 @@ public class AuthService {
             }
             return "Registered user successfully";
         }catch (DuplicateKeyException e) {
-            throw new DuplicateKeyException("User already exists!");
+            throw new DuplicateKeyException(e.getMessage());
         }
         catch (AccessDeniedException e) {
             throw new AccessDeniedException("You are not authorized to Enroll a User");

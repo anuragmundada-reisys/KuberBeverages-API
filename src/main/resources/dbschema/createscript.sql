@@ -115,8 +115,9 @@ CREATE TABLE `User` (
   `Email` varchar(45) DEFAULT NULL,
   `Password` varchar(500) NOT NULL,
   PRIMARY KEY (`User_Id`),
-  UNIQUE KEY `User_Name_UNIQUE` (`User_Name`)
-) ENGINE=InnoDB AUTO_INCREMENT=48 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `User_Name_UNIQUE` (`User_Name`),
+  UNIQUE KEY `Email_UNIQUE` (`Email`)
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Role
 CREATE TABLE `Role` (
