@@ -1,5 +1,6 @@
 package com.kuber.service;
 
+import com.kuber.Authentication.JwtUtils;
 import com.kuber.model.*;
 import com.kuber.service.mapper.InventoryRowMapper;
 import org.slf4j.Logger;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,19 +25,26 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 public class InventoryService {
 
     @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private static Logger LOGGER = LoggerFactory.getLogger(OrdersService.class);
 
-    private static final String INSERT_INVENTORY = "INSERT INTO Inventory(Product_Id, Quantity, Date) VALUES (:productId, :quantity, :productionDate)";
+    private static final String INSERT_INVENTORY = "INSERT INTO Inventory(Product_Id, Quantity, Date, Created_By, Created_Date) VALUES (:productId, :quantity, :productionDate, :createdBy, :createdDate)";
    private static final String GET_INVENTORY = "SELECT inventory.*, p.Product_Type FROM Inventory inventory LEFT JOIN  Product p ON inventory.Product_Id = p.Product_Id";
     @Transactional
-    public String addInventory(InventoryRequest inventoryRequest) throws SQLException {
+    public String addInventory(InventoryRequest inventoryRequest, String token) throws SQLException {
         MapSqlParameterSource parameters = new MapSqlParameterSource();
+        String userName = jwtUtils.getUserNameFromJwtToken(token);
         parameters.addValue("productionDate", inventoryRequest.getProductReceivedDate());
         for(Inventory inventory: inventoryRequest.getProducts()){
             parameters.addValue("productId", inventory.getProductId());
             parameters.addValue("quantity", inventory.getQuantity());
+            parameters.addValue("createdBy", userName);
+            parameters.addValue("createdDate", new Date());
+
             int rowsAffected = this.namedParameterJdbcTemplate.update(INSERT_INVENTORY, parameters);
 
             if (rowsAffected != 1) {

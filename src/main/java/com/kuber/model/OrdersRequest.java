@@ -28,7 +28,7 @@ public class OrdersRequest {
     private String assigneeName;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date updatedDate;
+    private Date assignedUpdatedDate;
 
     private boolean assignedStatus;
 

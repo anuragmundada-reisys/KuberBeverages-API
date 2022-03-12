@@ -23,6 +23,6 @@ public class AssignHistoryResponse {
     private String assigneeName;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date updatedDate;
+    private Date assignedUpdatedDate;
 
 }

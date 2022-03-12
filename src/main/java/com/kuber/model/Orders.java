@@ -20,7 +20,7 @@ public class Orders {
     private String assigneeName;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date updatedDate;
+    private Date assignedUpdatedDate;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date orderDate;

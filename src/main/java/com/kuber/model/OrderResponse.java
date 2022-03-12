@@ -32,7 +32,7 @@ public class OrderResponse {
     private String assigneeName;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
-    private Date updatedDate;
+    private Date assignedUpdatedDate;
 
     private ArrayList<OrderDetails> orders;
 }

@@ -1,5 +1,6 @@
 package com.kuber.service;
 
+import com.kuber.Authentication.JwtUtils;
 import com.kuber.model.*;
 import com.kuber.service.mapper.OrderResponseRowMapper;
 import com.kuber.service.mapper.PaymentHistoryRowMapper;
@@ -24,23 +25,28 @@ public class PaymentHistoryService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(PaymentHistoryService.class);
 
-    private static final String INSERT_PAYMENT_HISTORY = "INSERT INTO Payment_History(Order_Id, Received_Payment, Received_Date, Payment_Mode, Receiver_Name) VALUES (:orderId, :receivedPayment, :receivedPaymentDate, :paymentMode, :receiverName)";
+    private static final String INSERT_PAYMENT_HISTORY = "INSERT INTO Payment_History(Order_Id, Received_Payment, Received_Date, Payment_Mode, Receiver_Name, Received_By) VALUES (:orderId, :receivedPayment, :receivedPaymentDate, :paymentMode, :receiverName, :receivedBy)";
 
     private static final String GET_PAYMENT_HISTORY_DETAILS = "SELECT * FROM Payment_History WHERE Order_Id=:orderId";
 
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    @Autowired
+    private JwtUtils jwtUtils;
+
     @Transactional
-    public String addPaymentHistory(PaymentHistoryRequest paymentHistoryRequest) throws SQLException {
+    public String addPaymentHistory(PaymentHistoryRequest paymentHistoryRequest, String token) throws SQLException {
 
         MapSqlParameterSource parameters = new MapSqlParameterSource();
+        String userName = jwtUtils.getUserNameFromJwtToken(token);
         parameters.addValue("orderId", paymentHistoryRequest.getOrderId());
         for (PaymentHistory paymentHistory : paymentHistoryRequest.getReceivedPayments()) {
             parameters.addValue("receivedPayment", paymentHistory.getReceivedAmount());
             parameters.addValue("receivedPaymentDate", paymentHistory.getReceivedPaymentDate());
             parameters.addValue("paymentMode", paymentHistory.getPaymentMode());
             parameters.addValue("receiverName", paymentHistory.getReceiverName());
+            parameters.addValue("receivedBy", userName);
 
             int paymentHistoryRowsAffected = this.namedParameterJdbcTemplate.update(INSERT_PAYMENT_HISTORY, parameters);
             if (paymentHistoryRowsAffected != 1) {
