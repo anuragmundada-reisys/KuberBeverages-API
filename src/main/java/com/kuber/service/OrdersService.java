@@ -14,15 +14,14 @@ import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.security.access.AuthorizationServiceException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.webjars.NotFoundException;
 
 import java.sql.SQLException;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static java.lang.Boolean.parseBoolean;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -46,6 +45,7 @@ public class OrdersService {
     private static final String UPDATE_ORDER = "UPDATE Orders set TotalAmount=:totalAmount, Updated_By=:updatedBy, Updated_Date=:updatedDate where Order_Id=:orderId";
     private static final String UPDATE_ORDER_DETAILS = "UPDATE Order_Details set Product_Id=:productId, Quantity=:quantity, Rate=:rate, Amount=:amount, Updated_By=:updatedBy, Updated_Date=:updatedDate where Order_Details_Id=:orderDetailsId";
     private static final String GET_ORDER_BY_ID = "SELECT count(*) FROM Orders where Order_Id=:orderId";
+    private static final String DELETE_ORDER = "DELETE FROM Orders where Order_Id=:orderId";
     private static final String ASSIGN_ORDER = "UPDATE Orders set Assignee_Name=:assigneeName, Assigned_Updated_Date=:assignedUpdatedDate, Assigned_Status=:assignedStatus, Assigned_By=:assignedBy where Order_Id=:orderId";
     private static final String GET_ORDER_ASSIGNEE_HISTORY = "SELECT * FROM Assignee_History where Order_Id=:orderId order by Order_Id desc";
 
@@ -172,6 +172,35 @@ public class OrdersService {
             } catch (Exception e) {
                 throw new SQLException("SQL Error ", e);
             }
+
+    }
+
+    @Transactional
+    public String deleteOrder(String orderId, String token) throws SQLException {
+        Collection<? extends GrantedAuthority> roles = jwtUtils.getRolesFromJwtToken(token);
+        boolean isAdmin = false;
+        for (GrantedAuthority grantedAuthority : roles) {
+            if ((grantedAuthority.getAuthority()).equals("Admin") || (grantedAuthority.getAuthority()).equals("Super_Admin")) {
+                isAdmin = true;
+            }
+        }
+
+        if (!isAdmin) {
+            throw new AuthorizationServiceException("User not authorized to delete");
+        } else {
+            MapSqlParameterSource parameterSource = new MapSqlParameterSource();
+            parameterSource.addValue("orderId", orderId);
+            int count = this.namedParameterJdbcTemplate.queryForObject(GET_ORDER_BY_ID, parameterSource, Integer.class);
+            if (count == 0) {
+                throw new NotFoundException("Order Not Found");
+            }
+
+            int rowsAffected = this.namedParameterJdbcTemplate.update(DELETE_ORDER, parameterSource);
+            if (rowsAffected == 0) {
+                throw new SQLException("Failed to delete Order: " + orderId);
+            }
+            return "Order Deleted Successfully";
+        }
 
     }
 

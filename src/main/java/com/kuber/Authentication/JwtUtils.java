@@ -57,11 +57,12 @@ public class JwtUtils {
         Base64.Decoder decoder = Base64.getDecoder();
         String body = new String(decoder.decode(base64EncodedBody));
         JSONObject jsonObject = new JSONObject(body);
+        String rolesString = jsonObject.get("roles").toString();
 
-        final Collection<? extends GrantedAuthority> authorities =
+        final Collection<? extends GrantedAuthority> authorities = !rolesString.isEmpty() ?
                 Arrays.stream(jsonObject.get("roles").toString().split(","))
                         .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toList()) : new ArrayList<>();
 
         return authorities;
 

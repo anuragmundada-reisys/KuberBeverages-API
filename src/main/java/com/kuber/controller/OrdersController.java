@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.SQLException;
@@ -90,6 +91,25 @@ public class OrdersController {
         } catch (Exception e) {
             LOGGER.error("Error updating Order: ", e);
             return  new ResponseEntity<>("Internal error updating Order.", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Operation(summary = "Delete Order")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Order updated", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = "application/text")
+    public ResponseEntity<Object> deleteOrder(@PathVariable (name = "id") String id, @RequestHeader (name="Authorization") String token) {
+        try {
+            return new ResponseEntity<>(orderService.deleteOrder(id, token) + "", HttpStatus.CREATED);
+        } catch (AuthorizationServiceException ex) {
+            return  new ResponseEntity<>("You are unauthorized to delete the Order.", HttpStatus.UNAUTHORIZED);
+        } catch (Exception e) {
+            LOGGER.error("Error deleting Order: ", e);
+            return  new ResponseEntity<>("Internal error deleting Order.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
