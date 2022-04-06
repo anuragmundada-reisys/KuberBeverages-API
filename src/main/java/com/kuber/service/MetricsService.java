@@ -54,9 +54,10 @@ public class MetricsService {
     private static final String GET_PAYMENT_METRICS = "SELECT sum(Received_Payment) as `key`, Payment_Mode as `value` from Payment_History  where DATE_FORMAT(Received_Date, '%Y-%m-%d')= :receivedDate group by Payment_Mode";
 
 
-    private static final String GET_AVAILABLE_STOCK= "SELECT CASE WHEN i.sum IS NOT NULL AND oc.sum IS NOT NULL THEN (i.sum - oc.sum) WHEN i.sum IS NOT NULL THEN i.sum ELSE 0 END AS availableStock, \n" +
+    private static final String GET_AVAILABLE_STOCK= "SELECT CASE WHEN i.sum IS NOT NULL AND oc.sum IS NOT NULL THEN (i.sum - (oc.sum+ceil(oc.bottles/p.Case_Count))) WHEN i.sum IS NOT NULL THEN i.sum ELSE 0 END AS availableCases, \n" +
+            "CASE WHEN oc.bottles%p.Case_Count=0 THEN 0 ELSE p.Case_Count-(oc.bottles%p.Case_Count) END AS availableBottles,\n" +
             "p.Product_Type AS title FROM Product p LEFT JOIN  ((SELECT Product_Id, sum(Quantity) AS sum FROM Inventory GROUP BY 1) i\n" +
-            "LEFT JOIN (SELECT od.Product_Id, sum(od.Quantity) AS sum FROM Order_Details od  GROUP BY 1) oc\n" +
+            "LEFT JOIN (SELECT od.Product_Id, sum(od.Quantity) AS sum, sum(od.Free_Quantity) as bottles FROM Order_Details od  GROUP BY 1) oc\n" +
             "ON i.Product_Id = oc.Product_Id ) on i.Product_Id = p.Product_Id GROUP BY p.Product_Type";
 
 

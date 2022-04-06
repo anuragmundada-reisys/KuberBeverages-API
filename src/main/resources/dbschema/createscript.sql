@@ -13,6 +13,7 @@ CREATE TABLE `Assignee_History` (
 CREATE TABLE `Product` (
                            `Product_Id` int NOT NULL AUTO_INCREMENT,
                            `Product_Type` varchar(255) NOT NULL,
+                           `Case_Count` int,
                            PRIMARY KEY (`Product_Id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 

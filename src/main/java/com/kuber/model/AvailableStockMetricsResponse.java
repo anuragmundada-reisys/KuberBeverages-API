@@ -10,5 +10,8 @@ import lombok.Setter;
 public class AvailableStockMetricsResponse {
     private String title;
 
-    private int availableStock;
+    private int availableCases;
+
+    private int availableBottles;
+
 }

@@ -11,7 +11,8 @@ public class AvailableStockMetricsRowMapper implements RowMapper<AvailableStockM
     public AvailableStockMetricsResponse mapRow(ResultSet resultSet, int i) throws SQLException {
         AvailableStockMetricsResponse availableStockMetricsResponse = new AvailableStockMetricsResponse();
 
-        availableStockMetricsResponse.setAvailableStock(resultSet.getInt("availableStock"));
+        availableStockMetricsResponse.setAvailableCases(resultSet.getInt("availableCases"));
+        availableStockMetricsResponse.setAvailableBottles(resultSet.getInt("availableBottles"));
         availableStockMetricsResponse.setTitle(resultSet.getString("title"));
         return availableStockMetricsResponse;
     }
