@@ -17,6 +17,8 @@ public class OrderDetails {
 
     private int quantity;
 
+    private int freeQuantity;
+
     private int rate;
 
     private int amount;

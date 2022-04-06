@@ -38,12 +38,12 @@ public class OrdersService {
     private static Logger LOGGER = LoggerFactory.getLogger(OrdersService.class);
 
     private static final String INSERT_ORDER = "INSERT INTO Orders(Customer_Name, TotalAmount, Date, Bill_No, Created_By, Created_Date) VALUES ( :customerName, :totalAmount, :orderDate, :billNo, :createdBy, :createdDate)";
-    private static final String INSERT_ORDER_DETAILS = "INSERT INTO Order_Details(Order_Id, Product_Id, Quantity, Rate, Amount, Created_By, Created_Date) VALUES ( :orderId, :productId, :quantity, :rate, :amount, :createdBy, :createdDate)";
+    private static final String INSERT_ORDER_DETAILS = "INSERT INTO Order_Details(Order_Id, Product_Id, Quantity, Rate, Amount, Created_By, Created_Date, Free_Quantity) VALUES ( :orderId, :productId, :quantity, :rate, :amount, :createdBy, :createdDate, :freeQuantity)";
     private static final String GET_LAST_INSERTED_ORDER_ID = "SELECT LAST_INSERT_ID()";
 
 
     private static final String UPDATE_ORDER = "UPDATE Orders set TotalAmount=:totalAmount, Updated_By=:updatedBy, Updated_Date=:updatedDate where Order_Id=:orderId";
-    private static final String UPDATE_ORDER_DETAILS = "UPDATE Order_Details set Product_Id=:productId, Quantity=:quantity, Rate=:rate, Amount=:amount, Updated_By=:updatedBy, Updated_Date=:updatedDate where Order_Details_Id=:orderDetailsId";
+    private static final String UPDATE_ORDER_DETAILS = "UPDATE Order_Details set Product_Id=:productId, Quantity=:quantity, Free_Quantity=:freeQuantity, Rate=:rate, Amount=:amount, Updated_By=:updatedBy, Updated_Date=:updatedDate where Order_Details_Id=:orderDetailsId";
     private static final String GET_ORDER_BY_ID = "SELECT count(*) FROM Orders where Order_Id=:orderId";
     private static final String DELETE_ORDER = "DELETE FROM Orders where Order_Id=:orderId";
     private static final String ASSIGN_ORDER = "UPDATE Orders set Assignee_Name=:assigneeName, Assigned_Updated_Date=:assignedUpdatedDate, Assigned_Status=:assignedStatus, Assigned_By=:assignedBy where Order_Id=:orderId";
@@ -53,7 +53,7 @@ public class OrdersService {
             " from Orders orders\n" +
             " left join (SELECT CASE WHEN sum(Received_Payment) IS NULL THEN 0 ELSE sum(Received_Payment) END AS totalReceived, Order_Id \n" +
             " FROM Payment_History GROUP BY Order_Id) ph on orders.Order_Id = ph.Order_Id\n" +
-            " left join (SELECT Order_Id, JSON_ARRAYAGG(JSON_OBJECT('orderDetailsId', o.Order_Details_Id, 'productId', p.Product_Id , 'quantity', o.Quantity, 'rate', o.Rate, 'productType', p.Product_Type, 'amount', o.Amount )) as orders FROM Order_Details o left join Product p on p.Product_Id = o.Product_Id  GROUP BY o.Order_Id) od \n" +
+            " left join (SELECT Order_Id, JSON_ARRAYAGG(JSON_OBJECT('orderDetailsId', o.Order_Details_Id, 'productId', p.Product_Id , 'quantity', o.Quantity, 'rate', o.Rate, 'productType', p.Product_Type, 'amount', o.Amount, 'freeQuantity', o.Free_Quantity )) as orders FROM Order_Details o left join Product p on p.Product_Id = o.Product_Id  GROUP BY o.Order_Id) od \n" +
             " on orders.Order_Id = od.Order_Id";
 
     @Transactional
@@ -80,6 +80,7 @@ public class OrdersService {
         for (OrderDetailsDictionary orderDetails : orderRequest.getOrders()) {
             orderDetailsParameters.addValue("productId", orderDetails.getProductId());
             orderDetailsParameters.addValue("quantity", orderDetails.getQuantity());
+            orderDetailsParameters.addValue("freeQuantity", orderDetails.getFreeQuantity());
             orderDetailsParameters.addValue("rate", orderDetails.getRate());
             orderDetailsParameters.addValue("amount", orderDetails.getAmount());
             orderDetailsParameters.addValue("createdBy", userName);
@@ -131,6 +132,7 @@ public class OrdersService {
                 orderDetailsParameters.addValue("orderDetailsId", orderDetailsDictionary.getOrderDetailsId());
                 orderDetailsParameters.addValue("productId", orderDetailsDictionary.getProductId());
                 orderDetailsParameters.addValue("quantity", orderDetailsDictionary.getQuantity());
+                orderDetailsParameters.addValue("freeQuantity", orderDetailsDictionary.getFreeQuantity());
                 orderDetailsParameters.addValue("rate", orderDetailsDictionary.getRate());
                 orderDetailsParameters.addValue("amount", orderDetailsDictionary.getAmount());
                 orderDetailsParameters.addValue("updatedBy", userName);

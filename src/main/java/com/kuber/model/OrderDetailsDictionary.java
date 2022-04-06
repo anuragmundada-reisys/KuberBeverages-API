@@ -14,6 +14,8 @@ public class OrderDetailsDictionary {
 
     private int quantity;
 
+    private int freeQuantity;
+
     private int rate;
 
     private int amount;

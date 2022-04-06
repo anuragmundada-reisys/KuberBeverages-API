@@ -50,6 +50,7 @@ CREATE TABLE `Order_Details` (
   `Order_Id` bigint NOT NULL,
   `Product_Id` int NOT NULL,
   `Quantity` bigint DEFAULT NULL,
+  `Free_Quantity` int DEFAULT 0,
   `Rate` int NOT NULL,
   `Amount` int NOT NULL,
   `Created_By` varchar(45) DEFAULT NULL,
