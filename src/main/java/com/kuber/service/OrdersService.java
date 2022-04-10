@@ -1,10 +1,7 @@
 package com.kuber.service;
 
 import com.kuber.Authentication.JwtUtils;
-import com.kuber.model.OrderDetailsDictionary;
-import com.kuber.model.OrderResponse;
-import com.kuber.model.OrdersRequest;
-import com.kuber.model.AssignHistoryResponse;
+import com.kuber.model.*;
 import com.kuber.service.mapper.AssigneeHistoryRowMapper;
 import com.kuber.service.mapper.OrderResponseRowMapper;
 import org.slf4j.Logger;
@@ -34,6 +31,9 @@ public class OrdersService {
 
     @Autowired
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    @Autowired
+    private PaymentHistoryService paymentHistoryService;
 
     private static Logger LOGGER = LoggerFactory.getLogger(OrdersService.class);
 
@@ -88,6 +88,23 @@ public class OrdersService {
             int orderDetailsRowsAffected = this.namedParameterJdbcTemplate.update(INSERT_ORDER_DETAILS, orderDetailsParameters);
             if (orderDetailsRowsAffected != 1) {
                 throw new SQLException("Failed to insert OrderDetails: " + orderRequest.toString());
+            }
+        }
+
+        //Add Payment Details
+        if (orderRequest.getReceivedAmount() > 0) {
+            List<PaymentHistory> paymentHistoryList = new ArrayList<>();
+            PaymentHistory paymentHistory = new PaymentHistory();
+            paymentHistory.setPaymentMode(orderRequest.getPaymentMode());
+            paymentHistory.setReceivedAmount(orderRequest.getReceivedAmount());
+            paymentHistory.setReceiverName(userName);
+            paymentHistory.setReceivedPaymentDate(new Date());
+            paymentHistoryList.add(paymentHistory);
+            PaymentHistoryRequest paymentHistoryRequest = new PaymentHistoryRequest();
+            paymentHistoryRequest.setOrderId(lastInsertedOrderId);
+            paymentHistoryRequest.setReceivedPayments(paymentHistoryList);
+            if (!"Payment successfully added".equals(paymentHistoryService.addPaymentHistory(paymentHistoryRequest, token))) {
+                throw new SQLException("Failed to insert Payment Details: " + orderRequest.toString());
             }
         }
         return "Order successfully added";

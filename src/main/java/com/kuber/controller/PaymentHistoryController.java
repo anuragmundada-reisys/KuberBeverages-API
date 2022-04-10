@@ -51,7 +51,7 @@ public class PaymentHistoryController {
             @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
     @RequestMapping(method = RequestMethod.POST, produces = "application/text")
-    public ResponseEntity<Object> order(@RequestBody PaymentHistoryRequest paymentHistoryRequest, @RequestHeader (name="Authorization") String token) {
+    public ResponseEntity<Object> addPayment(@RequestBody PaymentHistoryRequest paymentHistoryRequest, @RequestHeader (name="Authorization") String token) {
         try {
                 return new ResponseEntity<>(paymentHistoryService.addPaymentHistory(paymentHistoryRequest, token) + "", HttpStatus.CREATED);
         } catch (Exception e) {

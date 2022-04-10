@@ -1,8 +1,9 @@
 package com.kuber.controller;
 
-import com.kuber.model.*;
+import com.kuber.model.LoginRequest;
+import com.kuber.model.LoginResponse;
+import com.kuber.model.SignupRequest;
 import com.kuber.service.AuthService;
-import com.kuber.service.OrdersService;
 import com.kuber.utility.Utility;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -16,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +25,6 @@ import org.webjars.NotFoundException;
 import java.nio.file.AccessDeniedException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/kuberbeverages/auth/v1")

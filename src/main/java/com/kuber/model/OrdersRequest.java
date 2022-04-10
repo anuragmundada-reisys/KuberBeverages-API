@@ -34,4 +34,8 @@ public class OrdersRequest {
 
     private List<OrderDetailsDictionary> orders;
 
+    private String paymentMode;
+
+    private int receivedAmount;
+
 }
