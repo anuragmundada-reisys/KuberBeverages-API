@@ -1,13 +1,8 @@
 package com.kuber.service;
 
-import com.kuber.model.AvailableStockMetricsResponse;
+import com.kuber.model.*;
 import com.kuber.model.Dictionary;
-import com.kuber.model.MetricsResponse;
-import com.kuber.model.RawMaterialDictionary;
-import com.kuber.service.mapper.AvailableStockMetricsRowMapper;
-import com.kuber.service.mapper.DictionaryRowMapper;
-import com.kuber.service.mapper.MetricsResponseRowMapper;
-import com.kuber.service.mapper.RawMaterialDictionaryRowMapper;
+import com.kuber.service.mapper.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +48,7 @@ public class MetricsService {
 
     private static final String GET_PAYMENT_METRICS = "SELECT sum(Received_Payment) as `key`, Payment_Mode as `value` from Payment_History  where DATE_FORMAT(Received_Date, '%Y-%m-%d')= :receivedDate group by Payment_Mode";
 
+    private static final String GET_BALANCE_DUE = "SELECT sum(Orders.TotalAmount) -  (select sum(Received_Payment) from Payment_History) as  Total_Balance_Due from Orders";
 
     private static final String GET_AVAILABLE_STOCK= "SELECT CASE WHEN i.sum IS NOT NULL AND oc.sum IS NOT NULL THEN (i.sum - (oc.sum+ceil(oc.bottles/p.Case_Count))) WHEN i.sum IS NOT NULL THEN i.sum ELSE 0 END AS availableCases, \n" +
             "CASE WHEN oc.bottles%p.Case_Count=0 THEN 0 ELSE p.Case_Count-(oc.bottles%p.Case_Count) END AS availableBottles,\n" +
@@ -85,6 +81,15 @@ public class MetricsService {
     public List<AvailableStockMetricsResponse> getAvailableStock() throws SQLException {
         try {
             return this.namedParameterJdbcTemplate.query(GET_AVAILABLE_STOCK, new MapSqlParameterSource(), new AvailableStockMetricsRowMapper());
+        } catch (Exception e) {
+            throw new SQLException("SQL Error ", e);
+        }
+    }
+
+    public List<TotalBalanceDueMetricsResponse> getBalanceDue() throws SQLException {
+        try {
+            return this.namedParameterJdbcTemplate.query(GET_BALANCE_DUE, new MapSqlParameterSource(), new TotalBalanceDueRowMapper());
+
         } catch (Exception e) {
             throw new SQLException("SQL Error ", e);
         }
