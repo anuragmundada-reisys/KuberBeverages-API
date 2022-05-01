@@ -29,6 +29,7 @@ public class OrderResponseRowMapper implements RowMapper<OrderResponse> {
         orderResponse.setAssigneeName(resultSet.getString("Assignee_Name"));
         orderResponse.setAssignedUpdatedDate(resultSet.getTimestamp("Assigned_Updated_Date"));
         orderResponse.setOrders(gson.fromJson((String) resultSet.getObject("orders"), listType));
+        orderResponse.setNotes(resultSet.getString("notes"));
 
         return orderResponse;
     }
