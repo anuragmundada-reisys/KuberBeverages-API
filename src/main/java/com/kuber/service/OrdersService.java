@@ -37,7 +37,7 @@ public class OrdersService {
 
     private static Logger LOGGER = LoggerFactory.getLogger(OrdersService.class);
 
-    private static final String INSERT_ORDER = "INSERT INTO Orders(Customer_Name, TotalAmount, Date, Bill_No, Created_By, Created_Date) VALUES ( :customerName, :totalAmount, :orderDate, :billNo, :createdBy, :createdDate)";
+    private static final String INSERT_ORDER = "INSERT INTO Orders(Customer_Name, TotalAmount, Date, Bill_No, Created_By, Created_Date, Notes) VALUES ( :customerName, :totalAmount, :orderDate, :billNo, :createdBy, :createdDate, :notes)";
     private static final String INSERT_ORDER_DETAILS = "INSERT INTO Order_Details(Order_Id, Product_Id, Quantity, Rate, Amount, Created_By, Created_Date, Free_Quantity) VALUES ( :orderId, :productId, :quantity, :rate, :amount, :createdBy, :createdDate, :freeQuantity)";
     private static final String GET_LAST_INSERTED_ORDER_ID = "SELECT LAST_INSERT_ID()";
 
@@ -66,6 +66,7 @@ public class OrdersService {
         parameters.addValue("totalAmount", orderRequest.getTotalAmount());
         parameters.addValue("orderDate", orderRequest.getOrderDate());
         parameters.addValue("billNo", orderRequest.getBillNo());
+        parameters.addValue("notes", orderRequest.getNotes());
         parameters.addValue("createdBy", userName);
         parameters.addValue("createdDate", new Date());
         int rowsAffected = this.namedParameterJdbcTemplate.update(INSERT_ORDER, parameters);

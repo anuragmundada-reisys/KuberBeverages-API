@@ -35,4 +35,6 @@ public class OrderResponse {
     private Date assignedUpdatedDate;
 
     private ArrayList<OrderDetails> orders;
+
+    private String notes;
 }
