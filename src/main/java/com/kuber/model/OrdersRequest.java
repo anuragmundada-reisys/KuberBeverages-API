@@ -40,4 +40,6 @@ public class OrdersRequest {
 
     private int receivedAmount;
 
+    private List<PaymentHistory> paymentHistory;
+
 }

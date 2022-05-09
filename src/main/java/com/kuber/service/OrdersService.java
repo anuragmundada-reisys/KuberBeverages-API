@@ -42,8 +42,10 @@ public class OrdersService {
     private static final String GET_LAST_INSERTED_ORDER_ID = "SELECT LAST_INSERT_ID()";
 
 
-    private static final String UPDATE_ORDER = "UPDATE Orders set TotalAmount=:totalAmount, Updated_By=:updatedBy, Updated_Date=:updatedDate where Order_Id=:orderId";
+    private static final String UPDATE_ORDER = "UPDATE Orders set TotalAmount=:totalAmount, Bill_No=:billNo, Customer_Name=:customerName, Notes=:notes, Updated_By=:updatedBy, Updated_Date=:updatedDate where Order_Id=:orderId";
     private static final String UPDATE_ORDER_DETAILS = "UPDATE Order_Details set Product_Id=:productId, Quantity=:quantity, Free_Quantity=:freeQuantity, Rate=:rate, Amount=:amount, Updated_By=:updatedBy, Updated_Date=:updatedDate where Order_Details_Id=:orderDetailsId";
+    private static final String UPDATE_PAYMENT_HISTORY = "UPDATE Payment_History set Received_Payment=:receivedAmount, Receiver_Name=:receiverName, Payment_Mode=:paymentMode, Updated_By=:updatedBy, Updated_Date=:updatedDate where Payment_Id=:paymentId";
+
     private static final String GET_ORDER_BY_ID = "SELECT count(*) FROM Orders where Order_Id=:orderId";
     private static final String DELETE_ORDER = "DELETE FROM Orders where Order_Id=:orderId";
     private static final String ASSIGN_ORDER = "UPDATE Orders set Assignee_Name=:assigneeName, Assigned_Updated_Date=:assignedUpdatedDate, Assigned_Status=:assignedStatus, Assigned_By=:assignedBy where Order_Id=:orderId";
@@ -137,12 +139,26 @@ public class OrdersService {
             MapSqlParameterSource orderParameters = new MapSqlParameterSource();
             orderParameters.addValue("orderId", orderRequest.getOrderId());
             orderParameters.addValue("totalAmount", orderRequest.getTotalAmount());
+            orderParameters.addValue("billNo", orderRequest.getBillNo());
+            orderParameters.addValue("customerName", orderRequest.getCustomerName());
+            orderParameters.addValue("notes", orderRequest.getNotes());
             orderParameters.addValue("updatedBy", userName);
             orderParameters.addValue("updatedDate", new Date());
             int rowsAffected = this.namedParameterJdbcTemplate.update(UPDATE_ORDER, orderParameters);
 
             if (rowsAffected != 1) {
                 throw new SQLException("Failed to update Order: " + orderRequest.toString());
+            }
+
+            for(PaymentHistory paymentHistory: orderRequest.getPaymentHistory()){
+                MapSqlParameterSource paymentHistoryParameters = new MapSqlParameterSource();
+                paymentHistoryParameters.addValue("paymentMode", paymentHistory.getPaymentMode());
+                paymentHistoryParameters.addValue("paymentId", paymentHistory.getPaymentId());
+                paymentHistoryParameters.addValue("receivedAmount", paymentHistory.getReceivedAmount());
+                paymentHistoryParameters.addValue("receiverName", paymentHistory.getReceiverName());
+                paymentHistoryParameters.addValue("updatedBy", userName);
+                paymentHistoryParameters.addValue("updatedDate",  new Date());
+                this.namedParameterJdbcTemplate.update(UPDATE_PAYMENT_HISTORY, paymentHistoryParameters);
             }
 
             for (OrderDetailsDictionary orderDetailsDictionary : orderRequest.getOrders()) {
