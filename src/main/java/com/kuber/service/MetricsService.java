@@ -56,6 +56,7 @@ public class MetricsService {
             "LEFT JOIN (SELECT od.Product_Id, sum(od.Quantity) AS sum, sum(od.Free_Quantity) as bottles FROM Order_Details od  GROUP BY 1) oc\n" +
             "ON i.Product_Id = oc.Product_Id ) on i.Product_Id = p.Product_Id GROUP BY p.Product_Type";
 
+    private static final String GET_EXPENSE_BY_DATE = "SELECT sum(Amount) as Total_Expense FROM Expense where DATE_FORMAT(Expense_Date, '%Y-%m-%d') =:expenseDate";
 
 
     @Autowired
@@ -89,6 +90,19 @@ public class MetricsService {
     public List<TotalBalanceDueMetricsResponse> getBalanceDue() throws SQLException {
         try {
             return this.namedParameterJdbcTemplate.query(GET_BALANCE_DUE, new MapSqlParameterSource(), new TotalBalanceDueRowMapper());
+
+        } catch (Exception e) {
+            throw new SQLException("SQL Error ", e);
+        }
+    }
+
+    public List<ExpenseByDateMetricsResponse> getExpenseByDate(Date receivedDate) throws SQLException {
+        try {
+            MapSqlParameterSource parameters = new MapSqlParameterSource();
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+            parameters.addValue("expenseDate", formatter.format(receivedDate));
+            System.out.println(parameters);
+            return this.namedParameterJdbcTemplate.query(GET_EXPENSE_BY_DATE, parameters, new ExpenseByDateRowMapper());
 
         } catch (Exception e) {
             throw new SQLException("SQL Error ", e);

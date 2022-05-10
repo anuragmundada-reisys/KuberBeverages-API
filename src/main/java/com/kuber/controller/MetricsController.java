@@ -1,9 +1,6 @@
 package com.kuber.controller;
 
-import com.kuber.model.AvailableStockMetricsResponse;
-import com.kuber.model.Dictionary;
-import com.kuber.model.MetricsResponse;
-import com.kuber.model.TotalBalanceDueMetricsResponse;
+import com.kuber.model.*;
 import com.kuber.service.MetricsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -71,6 +68,19 @@ public class MetricsController {
     @RequestMapping( value = "/totalbalancedue" , method = RequestMethod.GET, produces = "application/json")
     public ResponseEntity<Object> getBalanceDue() throws SQLException {
         List<TotalBalanceDueMetricsResponse> metricsList = metricsService.getBalanceDue();
+        return new ResponseEntity<>(metricsList, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get Expense by Date")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Get Expense by Date", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Bad Request", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Not Found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content)})
+    @RequestMapping( value = "/totalexpense" , method = RequestMethod.GET, produces = "application/json")
+    public ResponseEntity<Object> getExpenseByDate(@RequestParam("receivedDate")  @DateTimeFormat(pattern = "yyyy-MM-dd") Date expenseDate) throws SQLException {
+        List<ExpenseByDateMetricsResponse> metricsList = metricsService.getExpenseByDate(expenseDate);
         return new ResponseEntity<>(metricsList, HttpStatus.OK);
     }
 

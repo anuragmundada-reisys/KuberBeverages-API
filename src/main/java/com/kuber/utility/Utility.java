@@ -51,6 +51,20 @@ public class Utility {
         return errors;
     }
 
+    public static List<String> validateExpenseRequest(ExpenseRequest expense) {
+        List<String> errors = new ArrayList<>();
+
+        if(isEmpty(expense.getExpenseDate())){
+            errors.add("Expense date is required");
+        }
+
+        if(isEmpty(expense.getExpenses())){
+            errors.add("Please add expense");
+        }
+
+        return errors;
+    }
+
     public static List<String> validateSignUpRequest(SignupRequest signupRequest) {
         List<String> errors = new ArrayList<>();
 
