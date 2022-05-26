@@ -200,7 +200,7 @@ public class OrdersService {
                 }
             }
 
-            queryString.append(" group by orders.Order_Id order by orders.Order_Id desc");
+            queryString.append(" group by orders.Order_Id order by orders.Date desc");
             try {
                 MapSqlParameterSource parameters = new MapSqlParameterSource(params);
                 parameters.addValue("assignedStatus", parseBoolean(params.get("assignedStatus")));
